@@ -1,5 +1,5 @@
 ARG UBUNTU_TAG=24.04
-ARG QNAP8528=v1.2
+ARG QNAP8528=v1.4
 
 FROM ubuntu:${UBUNTU_TAG}
 RUN apt update && apt install -y \
