@@ -32,9 +32,13 @@ class disk:
             self.mount_path = mount_path
 
     def mount(self):
-        if not self.mounted:
-            check_call(["/bin/mount", "-o", "ro", self.drive, self.mount_path])
-            self.mounted = True
+        if self.mounted:
+            print("Already mounted")
+            return
+        print(f"Mounting {self.drive} to {self.mount_path}")
+        check_call(["/bin/mount", "-o", "ro", self.drive, self.mount_path])
+        self.mounted = True
+        print("Mounted")
 
     def __enter__(self):
         self.mount()
@@ -56,8 +60,12 @@ class disk:
 
     def umount(self, force: bool = False):
         if self.mounted or force:
+            print("Unmounting")
             check_call(["/bin/umount", self.mount_path])
             self.mounted = False
+            print("Unmounted")
+            return
+        print("Already unmounted and not forcing")
 
     def __del__(self):
         self.umount()

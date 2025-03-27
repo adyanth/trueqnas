@@ -19,7 +19,7 @@ def copy_data():
 
 def task_eject():
     # Task Eject
-    print("Ejecting")
+    print("task_eject")
     if copy_process and copy_process.is_alive():
         copy_process.kill()
         set(False)
@@ -37,7 +37,7 @@ def task_start():
             print("Already active, doing nothing")
             return
         copy_process.close()
-    print("Mounting and copying")
+    print("task_start")
     blink(2)
     # Task mount + copy
     copy_process = Process(target=copy_data)
