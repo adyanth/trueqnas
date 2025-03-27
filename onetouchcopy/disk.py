@@ -8,6 +8,7 @@ from os import listdir
 from os.path import join
 from subprocess import check_call
 from shutil import copy, copytree
+import traceback
 
 
 class disk:
@@ -32,7 +33,7 @@ class disk:
 
     def mount(self):
         if not self.mounted:
-            check_call(["/bin/mount", self.drive, self.mount_path])
+            check_call(["/bin/mount", "-o", "ro", self.drive, self.mount_path])
             self.mounted = True
 
     def __enter__(self):
@@ -41,7 +42,6 @@ class disk:
 
     def __exit__(self, exc_type, exc_value, tb):
         if exc_type is not None:
-            import traceback
             traceback.print_exception(exc_type, exc_value, tb)
         self.umount()
 
@@ -52,6 +52,7 @@ class disk:
         path = join(dest, subpath)
         print(f"Copying to {path}")
         copytree(self.mount_path, path, copy_function=copy)
+        print("Copy complete")
 
     def umount(self, force: bool = False):
         if self.mounted or force:
