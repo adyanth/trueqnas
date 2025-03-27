@@ -10,8 +10,10 @@ copy_process: Process = None
 
 
 def copy_data():
+    trigger_disk_act(state=True)
     with disk() as d:
         d.copy_to("/data/")
+    trigger_disk_act(state=False)
     set(False)
 
 
@@ -37,7 +39,6 @@ def task_start():
         copy_process.close()
     print("Mounting and copying")
     blink(2)
-    trigger_disk_act()
     # Task mount + copy
     copy_process = Process(target=copy_data)
     copy_process.start()

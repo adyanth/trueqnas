@@ -1,5 +1,6 @@
 FRONT_USB_SUBSTR = "0-usb-0:1"
 MOUNT_PATH = "/mnt"
+DEV_PATH = "/dev/disk/by-path/"
 # /dev/disk/by-path/pci-0000:00:14.0-usb-0:1:1.0-scsi-0:0:0:0
 
 from datetime import datetime
@@ -11,14 +12,17 @@ from shutil import copy, copytree
 
 class disk:
     def __init__(self, mount_path: str = None):
-        self.drive = next(
-            filter(
-                lambda x: x.contains("part"),
+        self.drive = join(
+            DEV_PATH,
+            next(
                 filter(
-                    lambda x: x.contains(FRONT_USB_SUBSTR),
-                    listdir("/dev/disk/by-path/"),
-                ),
-            )
+                    lambda x: "part" in x,
+                    filter(
+                        lambda x: FRONT_USB_SUBSTR in x,
+                        listdir(DEV_PATH),
+                    ),
+                )
+            ),
         )
         self.mounted = False
         if mount_path is None:
@@ -29,12 +33,16 @@ class disk:
     def mount(self):
         if not self.mounted:
             check_call(["/bin/mount", self.drive, self.mount_path])
+            self.mounted = True
 
     def __enter__(self):
         self.mount()
         return self
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, tb):
+        if exc_type is not None:
+            import traceback
+            traceback.print_exception(exc_type, exc_value, tb)
         self.umount()
 
     def copy_to(self, dest: str):
