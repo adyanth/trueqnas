@@ -5,14 +5,20 @@ from .usbled import set, blink, trigger_disk_act
 from .disk import disk
 
 DEVICE_NAME = "qnap8528"
-device, *_ = filter(lambda d: d.name == DEVICE_NAME, map(evdev.InputDevice, evdev.list_devices()))
+device = next(
+    filter(
+        lambda d: d.name == DEVICE_NAME, map(evdev.InputDevice, evdev.list_devices())
+    )
+)
 
 copy_process: Process = None
+
 
 def copy_data():
     with disk() as d:
         d.copy_to("/data/")
     set(False)
+
 
 def task_eject():
     # Task Eject
@@ -25,6 +31,7 @@ def task_eject():
     except Exception as e:
         print(e)
     blink(3)
+
 
 def task_start():
     global copy_process
@@ -39,6 +46,7 @@ def task_start():
     # Task mount + copy
     copy_process = Process(target=copy_data)
     copy_process.start()
+
 
 def run():
     LAST_DOWN_TIME = None

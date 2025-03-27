@@ -8,6 +8,7 @@ from os.path import join
 from subprocess import check_call
 from shutil import copy, copytree
 
+
 class disk:
     def __init__(self, mount_path: str = None):
         self.drive = next(
