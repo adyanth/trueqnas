@@ -9,6 +9,9 @@ RUN apt update && apt install -y \
   kmod \
   libelf-dev \
   make \
+  python3 \
+  python3-evdev \
+  rsync \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 RUN git clone https://github.com/0xGiddi/qnap8528.git \
