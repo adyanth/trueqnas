@@ -5,11 +5,6 @@ from .usbled import set, blink, trigger_disk_act
 from .disk import disk
 
 DEVICE_NAME = "qnap8528"
-device = next(
-    filter(
-        lambda d: d.name == DEVICE_NAME, map(evdev.InputDevice, evdev.list_devices())
-    )
-)
 
 copy_process: Process = None
 
@@ -50,6 +45,12 @@ def task_start():
 
 def run():
     LAST_DOWN_TIME = None
+    device = next(
+        filter(
+            lambda d: d.name == DEVICE_NAME,
+            map(evdev.InputDevice, evdev.list_devices()),
+        )
+    )
     print("Waiting for first event")
     for event in device.read_loop():
         if event.type == evdev.ecodes.EV_KEY:
