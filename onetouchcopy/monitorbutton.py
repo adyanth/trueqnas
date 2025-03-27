@@ -1,14 +1,25 @@
 import evdev
 from datetime import datetime
+from multiprocessing import Process
 from .usbled import set, blink, trigger_disk_act
 from .disk import disk
 
 DEVICE_NAME = "qnap8528"
 device, *_ = filter(lambda d: d.name == DEVICE_NAME, map(evdev.InputDevice, evdev.list_devices()))
 
+copy_process: Process = None
+
+def copy_data():
+    with disk() as d:
+        d.copy_to("/data/")
+    set(False)
+
 def task_eject():
     # Task Eject
     print("Ejecting")
+    if copy_process and copy_process.is_alive():
+        copy_process.kill()
+        set(False)
     try:
         disk().umount(force=True)
     except Exception as e:
@@ -16,13 +27,18 @@ def task_eject():
     blink(3)
 
 def task_start():
+    global copy_process
+    if copy_process:
+        if copy_process.is_alive():
+            print("Already active, doing nothing")
+            return
+        copy_process.close()
     print("Mounting and copying")
     blink(2)
     trigger_disk_act()
     # Task mount + copy
-    with disk() as d:
-        d.copy_to("/data/")
-    set(False)
+    copy_process = Process(target=copy_data)
+    copy_process.start()
 
 def run():
     LAST_DOWN_TIME = None
