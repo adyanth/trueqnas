@@ -7,9 +7,13 @@ from datetime import datetime
 from os import listdir
 from os.path import join
 from subprocess import check_call
+import shutil
 from shutil import copy, copytree
 import traceback
 
+# Disable folder permission mirroring
+# https://stackoverflow.com/questions/1303413/python-shutil-copytree-ignore-permissions
+shutil.copystat = lambda *a, **k: None
 
 class disk:
     def __init__(self, mount_path: str = None):

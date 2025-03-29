@@ -11,6 +11,7 @@ copy_process: Process = None
 
 LONG_PRESS_MILLIS = int(getenv("LONG_PRESS_MILLIS", "1500"))
 
+
 def copy_data():
     trigger_disk_act(state=True)
     with disk() as d:
