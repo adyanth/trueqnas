@@ -55,7 +55,11 @@ class disk:
         subpath = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         path = join(dest, subpath)
         print(f"Copying to {path}")
-        copytree(self.mount_path, path, copy_function=copy)
+        try:
+            copytree(self.mount_path, path, copy_function=copy)
+        except Exception as e:
+            from sys import stderr
+            print(e, file=stderr)
         print("Copy complete")
 
     def umount(self, force: bool = False):

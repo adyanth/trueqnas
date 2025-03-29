@@ -1,6 +1,7 @@
 import evdev
 from datetime import datetime
 from multiprocessing import Process
+from os import getenv
 from .usbled import set, blink, trigger_disk_act
 from .disk import disk
 
@@ -8,6 +9,7 @@ DEVICE_NAME = "qnap8528"
 
 copy_process: Process = None
 
+LONG_PRESS_MILLIS = int(getenv("LONG_PRESS_MILLIS", "1500"))
 
 def copy_data():
     trigger_disk_act(state=True)
@@ -62,7 +64,7 @@ def run():
                 case key_event.key_up if LAST_DOWN_TIME is not None:
                     time_held = datetime.now() - LAST_DOWN_TIME
                     LAST_DOWN_TIME = None
-                    if time_held.seconds >= 3:
+                    if time_held.total_seconds() * 1000 >= LONG_PRESS_MILLIS:
                         task_eject()
                     else:
                         task_start()

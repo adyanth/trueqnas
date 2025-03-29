@@ -5,4 +5,4 @@ make
 rmmod qnap8528.ko || true
 insmod qnap8528.ko skip_hw_check=true
 cd /app
-exec python3 main.py
+python3 main.py 2> app.err | tee app.log
