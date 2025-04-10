@@ -4,12 +4,13 @@ DEV_PATH = "/dev/disk/by-path/"
 # /dev/disk/by-path/pci-0000:00:14.0-usb-0:1:1.0-scsi-0:0:0:0
 
 from datetime import datetime
-from os import listdir
+from os import listdir, mkdir
 from os.path import join
 from subprocess import check_call
 import shutil
 from shutil import copy, copytree
 import traceback
+import sys
 
 # Disable folder permission mirroring
 # https://stackoverflow.com/questions/1303413/python-shutil-copytree-ignore-permissions
@@ -26,6 +27,13 @@ class disk:
                         lambda x: FRONT_USB_SUBSTR in x,
                         listdir(DEV_PATH),
                     ),
+                ),
+                next(
+                    filter(
+                        lambda x: FRONT_USB_SUBSTR in x,
+                        listdir(DEV_PATH),
+                    ),
+                    "/dev/sr0"
                 )
             ),
         )
@@ -60,7 +68,12 @@ class disk:
         path = join(dest, subpath)
         print(f"Copying to {path}")
         try:
-            copytree(self.mount_path, path, copy_function=copy)
+            if "VIDEO_TS" in listdir(self.mount_path):
+                print("Making MKV from DVD")
+                mkdir(path)
+                check_call(["makemkvcon", "mkv", "dev:/dev/sr0", "all", path], stderr=sys.stderr, stdout=sys.stdout)
+            else:
+                copytree(self.mount_path, path, copy_function=copy)
         except Exception as e:
             from sys import stderr
             print(e, file=stderr)
